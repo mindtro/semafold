@@ -5,7 +5,7 @@
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/mindtro/semafold)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
-**Vector-first compression for embeddings, retrieval, and KV-cache workloads.**
+**Vector compression with TurboQuant codecs for embeddings, retrieval, and KV-cache. 10x compression, pure NumPy, no GPU required.**
 
 Semafold is a vector-first compression toolkit for AI workloads that compresses embeddings, retrieval representations, and cache-shaped KV tensors with explicit byte accounting, typed encode/decode contracts, and validation evidence. It is designed for teams building AI infrastructure that need measurable storage reduction without losing visibility into distortion, artifact size, or integration boundaries.
 
@@ -19,6 +19,17 @@ It gives you:
 - explicit guarantees and validation evidence
 - deterministic synthetic validation and benchmarks
 - pure NumPy — no GPU, no CUDA, runs anywhere
+
+## Compression Results
+
+| Workload | Baseline | Setting | Artifact Size | Smaller | Ratio |
+|---|---:|---|---:|---:|---:|
+| Embedding `128 x 1536` | `float32` `786,432 B` | `TurboQuantMSE 3-bit` | `74,738 B` | `90.50%` | `10.52x` |
+| Embedding `128 x 1536` | `fp16/bf16` `393,216 B` | `TurboQuantMSE 3-bit` | `74,738 B` | `80.99%` | `5.26x` |
+| KV tensor `(4,8,256,128)` | `float32` `8,388,608 B` | `K=Prod 3b, V=MSE 3b` | `885,734 B` | `89.44%` | `9.47x` |
+| KV tensor `(4,8,256,128)` | `fp16/bf16` `4,194,304 B` | `K=Prod 3b, V=MSE 3b` | `885,734 B` | `78.88%` | `4.74x` |
+
+Full benchmark details: [turboquant_benchmark_report.md](benchmarks/turboquant_benchmark_report.md)
 
 Distribution / import names today:
 - distribution: `semafold`
@@ -202,33 +213,13 @@ Runnable versions of these examples live here:
 - [examples/turboquant_embedding.py](examples/turboquant_embedding.py)
 - [examples/turboquant_kv_block.py](examples/turboquant_kv_block.py)
 
-## Benchmark Snapshot
+## Benchmark Details
 
-The current benchmark story is strongest on synthetic, deterministic workloads. The table below summarizes measured outputs from:
+Benchmark runners and detailed report:
 
 - [turboquant_paper_validation.py](benchmarks/turboquant_paper_validation.py)
 - [turboquant_synthetic_kv_benchmark.py](benchmarks/turboquant_synthetic_kv_benchmark.py)
-- benchmark summary:
-  [turboquant_benchmark_report.md](benchmarks/turboquant_benchmark_report.md)
-
-### Representative Results
-
-| Workload | Baseline | Semafold Setting | Artifact Size | Smaller | Ratio |
-|---|---:|---|---:|---:|---:|
-| Embedding batch `128 x 1536` | dense `float32` `786,432 B` | `TurboQuantMSE 3-bit` | `74,738 B` | `90.50%` | `10.52x` |
-| Embedding batch `128 x 1536` | dense `fp16/bf16` `393,216 B` | `TurboQuantMSE 3-bit` | `74,738 B` | `80.99%` | `5.26x` |
-| Embedding batch `128 x 1536` | dense `float32` `786,432 B` | `TurboQuantProd 3 total bits` | `75,255 B` | `90.43%` | `10.45x` |
-| KV tensor `(4, 8, 256, 128)` | dense `float32` `8,388,608 B` | `K=Prod 3 bits, V=MSE 3 bits` | `885,734 B` | `89.44%` | `9.47x` |
-| KV tensor `(4, 8, 256, 128)` | dense `fp16/bf16` `4,194,304 B` | `K=Prod 3 bits, V=MSE 3 bits` | `885,734 B` | `78.88%` | `4.74x` |
-
-### How To Read These Numbers
-
-- `ratio` is baseline bytes divided by measured artifact bytes
-- `smaller` is percentage reduction in total stored bytes
-- artifact size includes payload, sidecars, and metadata
-- larger tensors amortize sidecar overhead better than very small blocks
-
-One honest caveat: very small K/V blocks can still beat dense `float32`, while being only roughly equal to or slightly worse than dense `fp16`. The benchmark report shows that tradeoff explicitly.
+- [turboquant_benchmark_report.md](benchmarks/turboquant_benchmark_report.md)
 
 ## Benchmarks
 
