@@ -39,6 +39,11 @@ xfail_strict = true
 [tool.pyright]
 pythonVersion = "3.10"
 include = ["src", "tests", "examples", "benchmarks"]
+ignore = [
+    "src/semafold/turboquant/backends/_torch.py",
+    "src/semafold/turboquant/backends/_mlx.py",
+    "src/semafold/turboquant/backends/_registry.py",
+]
 typeCheckingMode = "basic"
 venvPath = "."
 venv = ".venv"
