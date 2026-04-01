@@ -6,6 +6,7 @@ import numpy as np
 
 from semafold.turboquant.kv import TurboQuantKVConfig
 from semafold.turboquant.kv import TurboQuantKVPreviewCodec
+from semafold.turboquant.backends import get_backend
 
 
 def _format_bytes(value: int) -> str:
@@ -19,9 +20,11 @@ def _format_summary(*, baseline_bytes: int, fp16_bytes: int, bf16_bytes: int, st
     smaller_vs_float32 = 100.0 * (baseline_bytes - combined_bytes) / baseline_bytes if baseline_bytes > 0 else 0.0
     smaller_vs_fp16 = 100.0 * (fp16_bytes - combined_bytes) / fp16_bytes if fp16_bytes > 0 else 0.0
     smaller_vs_bf16 = 100.0 * (bf16_bytes - combined_bytes) / bf16_bytes if bf16_bytes > 0 else 0.0
+    backend = get_backend()
     return "\n".join(
         [
             "Semafold TurboQuant KV block example",
+            f"Active compute backend: {backend.name.upper()} ({backend.device_description})",
             f"baseline float32 bytes: {_format_bytes(baseline_bytes)}",
             f"baseline fp16/bf16 bytes: {_format_bytes(fp16_bytes)}",
             f"key artifact bytes: {_format_bytes(key_bytes)}",

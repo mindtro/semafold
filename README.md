@@ -1,11 +1,11 @@
 # Semafold
 
 [![CI](https://github.com/mindtro/semafold/actions/workflows/ci.yml/badge.svg)](https://github.com/mindtro/semafold/actions/workflows/ci.yml)
-[![tests](https://img.shields.io/badge/tests-151%20passed-brightgreen)](https://github.com/mindtro/semafold/actions)
+[![tests](https://img.shields.io/badge/tests-189%20passed-brightgreen)](https://github.com/mindtro/semafold/actions)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](https://github.com/mindtro/semafold)
 [![license](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
 
-**Vector compression with TurboQuant codecs for embeddings, retrieval, and KV-cache. 10x compression, pure NumPy, no GPU required.**
+**Vector compression with TurboQuant codecs for embeddings, retrieval, and KV-cache. 10x compression, pure NumPy core — no GPU required by default, but professionally accelerated on NVIDIA (CUDA) and Apple Silicon (Metal) when available.**
 
 Semafold is a vector-first compression toolkit for AI workloads that compresses embeddings, retrieval representations, and cache-shaped KV tensors with explicit byte accounting, typed encode/decode contracts, and validation evidence. It is designed for teams building AI infrastructure that need measurable storage reduction without losing visibility into distortion, artifact size, or integration boundaries.
 
@@ -18,7 +18,8 @@ It gives you:
 - measured byte accounting
 - explicit guarantees and validation evidence
 - deterministic synthetic validation and benchmarks
-- pure NumPy — no GPU, no CUDA, runs anywhere
+- pure NumPy core — no GPU required, runs anywhere
+- enterprise GPU acceleration — zero-config, automatic offloading to PyTorch (CUDA/MPS) or MLX (Apple Metal) when installed
 
 ## Compression Results
 
@@ -60,6 +61,11 @@ semafold
 │     └─ kv
 │        ├─ TurboQuantKVConfig
 │        └─ TurboQuantKVPreviewCodec
+├─ Compute backend layer  (v0.2.0)
+│  ├─ ComputeBackend protocol
+│  ├─ NumPyBackend   — always available (default)
+│  ├─ TorchBackend   — CUDA / MPS  (pip install semafold[torch])
+│  └─ MLXBackend     — Metal       (pip install semafold[mlx])
 └─ Validation and benchmarking
    ├─ contract / unit / integration tests
    ├─ paper-shaped vector validation
@@ -106,6 +112,15 @@ Available today, but intentionally outside the stable root surface:
 - `ScalarReferenceVectorCodec`
 
 That means TurboQuant already works, but it is currently a deep-import surface rather than a root export.
+
+## Install
+
+```bash
+pip install semafold              # NumPy core — no GPU required
+pip install semafold[torch]       # + NVIDIA CUDA / Apple MPS acceleration
+pip install semafold[mlx]         # + Apple Silicon Metal acceleration
+pip install "semafold[torch,mlx]" # both
+```
 
 ## Quickstart
 

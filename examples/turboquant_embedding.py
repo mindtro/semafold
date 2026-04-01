@@ -8,6 +8,7 @@ from semafold import VectorDecodeRequest
 from semafold import VectorEncodeRequest
 from semafold.turboquant import TurboQuantMSEConfig
 from semafold.turboquant import TurboQuantMSEVectorCodec
+from semafold.turboquant.backends import get_backend
 
 
 def _row_cosine_similarity(lhs: np.ndarray, rhs: np.ndarray) -> float:
@@ -27,9 +28,11 @@ def _format_summary(*, baseline_bytes: int, artifact_bytes: int, mse: float, cos
     bytes_saved = baseline_bytes - artifact_bytes
     smaller_pct = (100.0 * bytes_saved / baseline_bytes) if baseline_bytes > 0 else 0.0
     ratio = (baseline_bytes / artifact_bytes) if artifact_bytes > 0 else 0.0
+    backend = get_backend()
     return "\n".join(
         [
             "Semafold TurboQuant embedding example",
+            f"Active compute backend: {backend.name.upper()} ({backend.device_description})",
             f"baseline bytes: {_format_bytes(baseline_bytes)}",
             f"artifact bytes: {_format_bytes(artifact_bytes)}",
             f"bytes saved: {_format_bytes(bytes_saved)}",

@@ -4,18 +4,26 @@ build-backend = "hatchling.build"
 
 [project]
 name = "semafold"
-version = "0.1.0"
+version = "0.2.0"
 description = "Phase 1 incubating vector-first compression package with measured accounting and explicit evidence."
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 authors = [{ name = "Mindtro GmbH", email = "team@mindtro.com" }]
 dependencies = ["numpy>=1.26"]
-keywords = ["compression", "vectors", "quantization", "ai"]
+keywords = ["compression", "vectors", "quantization", "ai", "gpu", "cuda", "mlx", "metal", "kv-cache", "embeddings"]
 classifiers = ["License :: OSI Approved :: Apache Software License"]
+
+[project.urls]
+Homepage = "https://github.com/mindtro/semafold"
+Repository = "https://github.com/mindtro/semafold"
+Changelog = "https://github.com/mindtro/semafold/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = ["build>=1.2", "pyright>=1.1", "pytest>=9"]
+torch = ["torch>=2.0"]
+mlx = ["mlx>=0.5"]
+all = ["torch>=2.0", "mlx>=0.5"]
 
 [tool.hatch.build]
 exclude = [".pytest_cache/**", "**/__pycache__/**", "**/*.py[cod]"]
@@ -32,3 +40,9 @@ xfail_strict = true
 pythonVersion = "3.10"
 include = ["src", "tests", "examples", "benchmarks"]
 typeCheckingMode = "basic"
+venvPath = "."
+venv = ".venv"
+# Optional backends (torch, mlx) are not installed in the base dev environment.
+# reportMissingImports is silenced so pyright does not error on those packages;
+# structural type errors in those files are still caught.
+reportMissingImports = "none"
